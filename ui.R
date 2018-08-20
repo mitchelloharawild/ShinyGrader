@@ -50,7 +50,8 @@ shinyUI(
                 column(6,
                   box(
                     uiOutput("out_select_code"),
-                    aceEditor("out_code", readOnly = TRUE, height = "600px", value = "", mode = "r", theme = "ambiance", wordWrap = TRUE),
+                    # aceEditor("out_code", readOnly = TRUE, height = "600px", value = "", mode = "r", wordWrap = TRUE),
+                    uiOutput("out_code"),
                     width = 12
                   ),
                   box(

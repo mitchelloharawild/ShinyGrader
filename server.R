@@ -62,16 +62,17 @@ shinyServer(
       radioButtons("current_rmd", NULL, basename(current_rmds()), inline = TRUE)
     })
     
-    observe({
+    output$out_code <- renderUI({
       req(input$current_rmd)
-      match_rmd <- current_rmds()[basename(current_rmds()) == input$current_rmd]
-      if(length(match_rmd)==1){
+      match_rmd <- current_rmds()[match(input$current_rmd,basename(current_rmds()), nomatch = 1)]
+      if(!is.na(match_rmd)){
         code <- paste0(readLines(match_rmd), collapse = "\n")
       }
       else{
         code <- "Could not read code"
       }
-      updateAceEditor(session, "out_code", value = code, mode = "r", theme = "ambiance")
+      # updateAceEditor(session, "out_code", value = "updatedText")
+      aceEditor(as.character(rnorm(1)), readOnly = TRUE, height = "600px", value = code, mode = "r", wordWrap = TRUE)
     })
     
     output$ui_cache <- renderUI({
