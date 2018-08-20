@@ -83,9 +83,14 @@ shinyServer(
       restoreGrades()
     })
     
+    grade_data <- reactive({
+      updateGrades()
+      new_tibble(list(id = names(v$out), grade = map_chr(v$out, "grade"), feedback = map_chr(v$out, "feedback")))
+    })
+    
     output$export <- downloadHandler(
       filename = function() {
-        paste0("marks-", Sys.time(), ".xlsx")
+        paste0("marks-", Sys.time(), ".csv")
       },
       content = function(file){
         write_csv(grade_data(), path = file)
