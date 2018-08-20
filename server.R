@@ -59,7 +59,12 @@ shinyServer(
     })
     
     output$out_select_code <- renderUI({
-      radioButtons("current_rmd", NULL, basename(current_rmds()), inline = TRUE)
+      if(length(current_rmds()) > 0){
+        radioButtons("current_rmd", NULL, basename(current_rmds()), inline = TRUE)
+      }
+      else{
+        radioButtons("current_rmd", NULL, "No RMD found", inline = TRUE)
+      }
     })
     
     output$out_code <- renderUI({
