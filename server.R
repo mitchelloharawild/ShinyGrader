@@ -17,7 +17,8 @@ shinyServer(
     })
     
     v <- reactiveValues(
-      idx = 1
+      idx = 1,
+      out = list()
     )
     
     current_student <- reactive({
@@ -62,11 +63,24 @@ shinyServer(
         invoke(tabBox, .)
     })
     
+    updateGrades <- function(){
+      v$out[[basename(current_student())]] <- list(grade = input$grade, feedback = input$feedback)
+    }
+    
+    restoreGrades <- function(){
+      updateTextAreaInput(session, "feedback", value = v$out[[basename(current_student())]]$feedback%||%"")
+      updateTextInput(session, "grade", value = v$out[[basename(current_student())]]$grade%||%"")
+    }
+    
     observeEvent(input$btn_prev, {
+      updateGrades()
       v$idx <- pmax(1, v$idx - 1)
+      restoreGrades()
     })
     observeEvent(input$btn_next, {
+      updateGrades()
       v$idx <- pmin(length(submission_dirs()), v$idx + 1)
+      restoreGrades()
     })
     
     output$export <- downloadHandler(
