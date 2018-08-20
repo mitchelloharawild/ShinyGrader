@@ -45,6 +45,7 @@ shinyServer(
     })
     
     current_rmds <- reactive({
+      restoreGrades()
       list.files(current_student(), pattern = ".rmd|.Rmd|.RMD", full.names = TRUE, recursive = TRUE)
     })
     
@@ -117,12 +118,10 @@ shinyServer(
     observeEvent(input$btn_prev, {
       updateGrades()
       v$idx <- pmax(1, v$idx - 1)
-      restoreGrades()
     })
     observeEvent(input$btn_next, {
       updateGrades()
       v$idx <- pmin(length(submission_dirs()), v$idx + 1)
-      restoreGrades()
     })
     
     grade_data <- reactive({
