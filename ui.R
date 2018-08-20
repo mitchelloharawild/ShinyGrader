@@ -32,13 +32,9 @@ shinyUI(
         tags$link(rel = "stylesheet", type = "text/css", href = "custom.css")
       ),
       tabItems(
-        tabItem("tab_upload", 
-                box(
-                  title = "File Input (ZIP)",
-                  fileInput("files", label = NULL, accept = "application/zip"),
-                  width = 12,
-                  status = "primary",
-                  collapsible = TRUE
+        tabItem("tab_upload",
+                uiOutput(
+                  "file_input"
                 ),
                 withSpinner(uiOutput("out_status"))
         ),

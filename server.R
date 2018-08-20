@@ -8,18 +8,35 @@ options(shiny.maxRequestSize=50*1024^2)
 
 shinyServer(
   function(input, output, session) {
+    submissionZip <- reactive({
+      if(isTruthy(input$files)){
+        file.copy(input$files$datapath, "submissions.zip")
+      }
+      if(file.exists("submissions.zip") && file.exists("cache.RData")){
+        "submissions.zip"
+      }
+      else{
+        req(FALSE)
+      }
+    })
+    
     submission_dirs <- reactive({
-      req(input$files)
-      unlink(path <- file.path(tempdir(), input$files$name), recursive = TRUE)
+      unlink(path <- file.path(tempdir(), "ShinyGrader_submissions"), recursive = TRUE)
       dir.create(path)
-      unzip(input$files$datapath, exdir = path)
+      unzip(submissionZip(), exdir = path)
       list.dirs(path, full.names = TRUE, recursive = FALSE)
     })
     
-    v <- reactiveValues(
-      idx = 1,
-      out = list()
-    )
+    if(file.exists("submissions.zip") && file.exists("cache.RData")){
+      load("cache.RData")
+      v <- invoke(reactiveValues, cache)
+    }
+    else{
+      v <- reactiveValues(
+        idx = 1,
+        out = list()
+      )
+    }
     
     current_student <- reactive({
       submission_dirs()[v$idx]
@@ -53,6 +70,16 @@ shinyServer(
         code <- "Could not read code"
       }
       updateAceEditor(session, "out_code", value = code, mode = "r", theme = "ambiance")
+    })
+    
+    output$file_input <- renderUI({
+      box(
+        title = "File Input (ZIP)",
+        fileInput("files", label = NULL, accept = "application/zip"),
+        width = 12,
+        status = "primary",
+        collapsible = TRUE
+      )
     })
     
     output$out_html <- renderUI({
@@ -96,5 +123,10 @@ shinyServer(
         write_csv(grade_data(), path = file)
       }
     )
+    
+    onStop(function(){
+      cache <- isolate(reactiveValuesToList(v))
+      save(cache, file = "cache.RData")
+    })
   }
 )
