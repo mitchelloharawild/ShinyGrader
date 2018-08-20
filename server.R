@@ -108,6 +108,10 @@ shinyServer(
     
     updateGrades <- function(){
       v$out[[basename(current_student())]] <- list(grade = input$grade, feedback = input$feedback)
+      
+      # Save cache to disk
+      cache <- isolate(reactiveValuesToList(v))
+      save(cache, file = "cache.RData")
     }
     
     restoreGrades <- function(){
