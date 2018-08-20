@@ -11,6 +11,8 @@ shinyServer(
     submissionZip <- reactive({
       if(isTruthy(input$files)){
         file.copy(input$files$datapath, "submissions.zip")
+        v$idx <- 1
+        v$out <- list()
       }
       if(file.exists("submissions.zip") && file.exists("cache.RData")){
         "submissions.zip"
@@ -72,14 +74,21 @@ shinyServer(
       updateAceEditor(session, "out_code", value = code, mode = "r", theme = "ambiance")
     })
     
-    output$file_input <- renderUI({
-      box(
-        title = "File Input (ZIP)",
-        fileInput("files", label = NULL, accept = "application/zip"),
-        width = 12,
-        status = "primary",
-        collapsible = TRUE
-      )
+    output$ui_cache <- renderUI({
+      if(file.exists("submissions.zip") && file.exists("cache.RData")){
+        infoBox(
+          title = NULL,
+          value = div(
+            h3("Cached assignment submissions found."),
+            h4("CAUTION: Uploading new submissions will clear the cache and all marking will be lost!")
+          ),
+          width = 12,
+          icon = icon("info"),
+          color = "green"
+        )
+      } else {
+        NULL
+      }
     })
     
     output$out_html <- renderUI({
