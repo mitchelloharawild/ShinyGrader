@@ -10,7 +10,7 @@ shinyServer(
   function(input, output, session) {
     submissionZip <- reactive({
       if(isTruthy(input$files)){
-        file.copy(input$files$datapath, "submissions.zip")
+        file.copy(input$files$datapath, "submissions.zip", overwrite = TRUE)
         v$idx <- 1
         v$out <- list()
       }
