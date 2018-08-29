@@ -4,7 +4,7 @@ library(purrr)
 library(rlang)
 library(shinyAce)
 
-options(shiny.maxRequestSize=50*1024^2)
+options(shiny.maxRequestSize=100*1024^2)
 
 shinyServer(
   function(input, output, session) {
