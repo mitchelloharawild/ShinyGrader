@@ -13,6 +13,7 @@ shinyServer(
         file.copy(input$files$datapath, "submissions.zip", overwrite = TRUE)
         v$idx <- 1
         v$out <- list()
+        v$display_trigger <- FALSE
       }
       if(file.exists("submissions.zip") && file.exists("cache.RData")){
         "submissions.zip"
@@ -36,7 +37,8 @@ shinyServer(
     else{
       v <- reactiveValues(
         idx = 1,
-        out = list()
+        out = list(),
+        display_trigger = FALSE
       )
     }
     
@@ -50,6 +52,7 @@ shinyServer(
     })
     
     current_htmls <- reactive({
+      v$display_trigger
       list.files(current_student(), pattern = ".html", full.names = TRUE, recursive = TRUE)
     })
     
@@ -59,9 +62,25 @@ shinyServer(
       )
     })
     
+    observeEvent(input$btn_knit, {
+      x <- file.path(current_student(), input$current_rmd)
+      lns <- read_lines(x)
+      lns[grepl("opts_chunk\\$set", lns)] <- "knitr::opts_chunk$set(echo = TRUE, error = TRUE)"
+      write_lines(lns, x)
+      
+      system2(file.path(R.home("bin"), "Rscript"),
+              c("-e", shQuote(paste0("rmarkdown::render(", shQuote(x),
+                ", output_format = ", shQuote("html_document"), ", output_dir = ", shQuote(current_student()), ")"))))
+      
+      v$display_trigger <- !(v$display_trigger)
+    })
+    
     output$out_select_code <- renderUI({
       if(length(current_rmds()) > 0){
-        radioButtons("current_rmd", NULL, basename(current_rmds()), inline = TRUE)
+        fluidRow(
+          column(10, radioButtons("current_rmd", NULL, basename(current_rmds()), inline = TRUE)),
+          column(2, actionButton("btn_knit", label = "Knit", icon = icon("file-code")))
+        )
       }
       else{
         radioButtons("current_rmd", NULL, "No RMD found", inline = TRUE)
