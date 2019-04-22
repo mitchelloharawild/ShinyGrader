@@ -62,18 +62,22 @@ shinyServer(
       )
     })
     
+    output$out_feedback <- renderText({
+      paste0("Feedback (student ", v$idx, "/", length(submission_dirs()), ")")
+    })
+    
     observeEvent(input$btn_knit, {
       x <- file.path(current_student(), input$current_rmd)
       lns <- read_lines(x)
       lns[grepl("opts_chunk\\$set", lns)] <- "knitr::opts_chunk$set(echo = TRUE, error = TRUE)"
       write_lines(lns, x)
       
-      # system2(file.path(R.home("bin"), "Rscript"),
-      #         c("-e", shQuote(paste0("rmarkdown::render(", shQuote(x),
-      #           ", output_format = ", shQuote("html_document"), ", output_dir = ", shQuote(current_student()), ")"))))
+      system2(file.path(R.home("bin"), "Rscript"),
+              c("-e", shQuote(paste0("rmarkdown::render(", shQuote(x),
+                ", output_format = ", shQuote("html_document"), ", output_dir = ", shQuote(current_student()), ")"))))
 
-      rmarkdown::render(x, output_format = "html_document", output_dir = current_student(), 
-                        envir = new.env(parent = globalenv()))
+      # rmarkdown::render(x, output_format = "html_document", output_dir = current_student(), 
+      #                   envir = new.env(parent = globalenv()))
       
       v$display_trigger <- !(v$display_trigger)
     })

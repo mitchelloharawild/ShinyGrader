@@ -58,7 +58,7 @@ shinyUI(
                     width = 12
                   ),
                   box(
-                    title = "Feedback",
+                    title = textOutput("out_feedback"),
                     column(8, textAreaInput("feedback", NULL, rows = 4, placeholder = "Brief feedback")),
                     column(4,
                       textInput("grade", NULL, placeholder = "Grade"),
