@@ -69,7 +69,12 @@ shinyServer(
     observeEvent(input$btn_knit, {
       x <- file.path(current_student(), input$current_rmd)
       lns <- read_lines(x)
-      lns[grepl("opts_chunk\\$set", lns)] <- "knitr::opts_chunk$set(echo = TRUE, error = TRUE)"
+      lns[which(grepl("---", lns))[2]] <- "
+---
+```{r}
+knitr::opts_chunk$set(echo = TRUE, error = TRUE)
+````
+"
       write_lines(lns, x)
       
       system2(file.path(R.home("bin"), "Rscript"),
