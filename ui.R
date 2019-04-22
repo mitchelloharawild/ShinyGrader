@@ -52,9 +52,9 @@ shinyUI(
                     uiOutput("out_select_code"),
                     # aceEditor("out_code", height = "600px", value = "\r", mode = "r", wordWrap = TRUE,
                     #           readOnly = TRUE),
-                    div(style="height:600px;overflow-y:scroll",
-                        verbatimTextOutput("out_code")
-                    ),
+                    textAreaInput("out_code", NULL, height="600px"),
+                    # div(style="height:600px;overflow-y:scroll",
+                    # ),
                     width = 12
                   ),
                   box(

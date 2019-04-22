@@ -68,7 +68,8 @@ shinyServer(
     
     observeEvent(input$btn_knit, {
       x <- file.path(current_student(), input$current_rmd)
-      lns <- read_lines(x)
+      lns <- strsplit(input$out_code, "\n")[[1]]
+      # lns <- read_lines(x)
       lns[which(grepl("---", lns))[2]] <- "
 ---
 ```{r}
@@ -99,7 +100,7 @@ knitr::opts_chunk$set(echo = TRUE, error = TRUE)
       }
     })
     
-    output$out_code <- renderText({
+    observe({
       req(input$current_rmd, current_rmds())
       v$display_trigger
       match_rmd <- current_rmds()[match(input$current_rmd,basename(current_rmds()), nomatch = 1)]
@@ -112,6 +113,7 @@ knitr::opts_chunk$set(echo = TRUE, error = TRUE)
       }
       # updateAceEditor(session, "out_code", value = code)
       code
+      updateTextAreaInput(session, "out_code", value = code)
     })
     
     output$ui_cache <- renderUI({
