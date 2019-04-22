@@ -2,7 +2,7 @@ library(shiny)
 library(tidyverse)
 library(purrr)
 library(rlang)
-library(shinyAce)
+# library(shinyAce)
 
 options(shiny.maxRequestSize=100*1024^2)
 
@@ -68,9 +68,12 @@ shinyServer(
       lns[grepl("opts_chunk\\$set", lns)] <- "knitr::opts_chunk$set(echo = TRUE, error = TRUE)"
       write_lines(lns, x)
       
-      system2(file.path(R.home("bin"), "Rscript"),
-              c("-e", shQuote(paste0("rmarkdown::render(", shQuote(x),
-                ", output_format = ", shQuote("html_document"), ", output_dir = ", shQuote(current_student()), ")"))))
+      # system2(file.path(R.home("bin"), "Rscript"),
+      #         c("-e", shQuote(paste0("rmarkdown::render(", shQuote(x),
+      #           ", output_format = ", shQuote("html_document"), ", output_dir = ", shQuote(current_student()), ")"))))
+
+      rmarkdown::render(x, output_format = "html_document", output_dir = current_student(), 
+                        envir = new.env(parent = globalenv()))
       
       v$display_trigger <- !(v$display_trigger)
     })
@@ -87,17 +90,19 @@ shinyServer(
       }
     })
     
-    output$out_code <- renderUI({
-      req(input$current_rmd)
+    output$out_code <- renderText({
+      req(input$current_rmd, current_rmds())
+      v$display_trigger
       match_rmd <- current_rmds()[match(input$current_rmd,basename(current_rmds()), nomatch = 1)]
+      print(match_rmd)
       if(!is.na(match_rmd)){
         code <- paste0(readLines(match_rmd), collapse = "\n")
       }
       else{
         code <- "Could not read code"
       }
-      # updateAceEditor(session, "out_code", value = "updatedText")
-      aceEditor(as.character(rnorm(1)), readOnly = TRUE, height = "600px", value = code, mode = "r", wordWrap = TRUE)
+      # updateAceEditor(session, "out_code", value = code)
+      code
     })
     
     output$ui_cache <- renderUI({
@@ -142,6 +147,7 @@ shinyServer(
       updateGrades()
       v$idx <- pmax(1, v$idx - 1)
     })
+    
     observeEvent(input$btn_next, {
       updateGrades()
       v$idx <- pmin(length(submission_dirs()), v$idx + 1)
