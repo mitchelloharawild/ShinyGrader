@@ -48,6 +48,9 @@ shinyServer(
     
     current_rmds <- reactive({
       restoreGrades()
+      zips <- list.files(current_student(), pattern = ".zip", full.names = TRUE, recursive = TRUE)
+      map(zips, unzip, exdir = current_student())
+      map(zips, file.remove)
       list.files(current_student(), pattern = ".rmd|.Rmd|.RMD", full.names = TRUE, recursive = TRUE)
     })
     
