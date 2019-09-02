@@ -37,8 +37,15 @@ shinyUI(
                   "ui_cache"
                 ),
                 box(
-                  title = "File Input (ZIP)",
+                  title = "Assignment files input (ZIP)",
                   fileInput("files", label = NULL, accept = "application/zip"),
+                  width = 12,
+                  status = "primary",
+                  collapsible = TRUE
+                ),
+                box(
+                  title = "Evaluation environment input (ZIP)",
+                  fileInput("wd_files", label = NULL, accept = "application/zip"),
                   width = 12,
                   status = "primary",
                   collapsible = TRUE

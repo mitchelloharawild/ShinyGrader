@@ -23,6 +23,28 @@ shinyServer(
       }
     })
     
+    
+    wdZip <- reactive({
+      if(isTruthy(input$wd_files)){
+        file.copy(input$wd_files$datapath, "wd_eval.zip", overwrite = TRUE)
+      }
+      if(file.exists("wd_eval.zip") && file.exists("cache.RData")){
+        "wd_eval.zip"
+      }
+      else{
+        req(FALSE)
+      }
+    })
+    
+    eval_dir <- reactive({
+      unlink(path <- file.path(dirname(submission_dirs()[1]), "ShinyGrader_wd"))
+      dir.create(path)
+      if(isTruthy(input$wd_files)){
+        unzip(wdZip(), exdir = path)
+      }
+      path
+    })
+    
     submission_dirs <- reactive({
       unlink(path <- file.path(tempdir(), "ShinyGrader_submissions"), recursive = TRUE)
       dir.create(path)
@@ -83,7 +105,9 @@ knitr::opts_chunk$set(echo = TRUE, error = TRUE)
       
       system2(file.path(R.home("bin"), "Rscript"),
               c("-e", shQuote(paste0("rmarkdown::render(", shQuote(x),
-                ", output_format = ", shQuote("html_document"), ", output_dir = ", shQuote(current_student()), ")"))))
+                                     ", output_format = ", shQuote("html_document"), 
+                                     ", knit_root_dir = ", shQuote(eval_dir()), 
+                                     ", output_dir = ", shQuote(current_student()), ")"))))
 
       # rmarkdown::render(x, output_format = "html_document", output_dir = current_student(), 
       #                   envir = new.env(parent = globalenv()))
