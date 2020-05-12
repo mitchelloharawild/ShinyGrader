@@ -95,7 +95,7 @@ shinyServer(
       x <- file.path(current_student(), input$current_rmd)
       lns <- strsplit(input$out_code, "\n")[[1]]
       # lns <- read_lines(x)
-      lns[which(grepl("---", lns))[2]] <- "
+      lns[which(grepl("^---", lns))[2]] <- "
 ---
 ```{r}
 knitr::opts_chunk$set(echo = TRUE, error = TRUE)
