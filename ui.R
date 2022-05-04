@@ -21,7 +21,7 @@ shinyUI(
                      style = "margin: 0;",
                      label = NULL,
                      class = "",
-                     icon("floppy-o"),
+                     icon("floppy-disk"),
                      span("Export Grades")
           )
         )

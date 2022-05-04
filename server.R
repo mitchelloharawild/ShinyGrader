@@ -83,7 +83,7 @@ shinyServer(
     
     output$out_status <- renderUI({
       div(
-        valueBox(length(submission_dirs()), "Total submissions", icon = icon("file-code-o"))
+        valueBox(length(submission_dirs()), "Total submissions", icon = icon("file-code"))
       )
     })
     
