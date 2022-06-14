@@ -73,7 +73,7 @@ shinyServer(
       zips <- list.files(current_student(), pattern = ".zip", full.names = TRUE, recursive = TRUE)
       map(zips, unzip, exdir = current_student())
       map(zips, file.remove)
-      list.files(current_student(), pattern = "\\.rmd|\\.Rmd|\\.RMD|\\.r|\\.R", full.names = TRUE, recursive = TRUE)
+      list.files(current_student(), pattern = "(\\.rmd|\\.Rmd|\\.RMD|\\.r|\\.R)$", full.names = TRUE, recursive = TRUE)
     })
     
     current_htmls <- reactive({
